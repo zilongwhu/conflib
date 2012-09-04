@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include "buffer.h"
 
 static int nextPower2(int val)
@@ -101,7 +100,7 @@ buffer_t &buffer_t::operator =(const buffer_t &o)
 	return *this;
 }
 
-buffer_t &buffer_t::append(const char *fmt, ...)
+buffer_t &buffer_t::append(const char *fmt, va_list va)
 {
 	if (!_buffer)
 	{
@@ -109,10 +108,7 @@ buffer_t &buffer_t::append(const char *fmt, ...)
 		return *this;
 	}
 	const size_t left_sz = _curSize - (_current - _buffer);
-	va_list va;
-	va_start(va, fmt);
 	int ret = vsnprintf(_current, left_sz, fmt, va);
-	va_end(va);
 	if (ret < 0) return *this;
 	if (ret < left_sz)
 	{
@@ -136,11 +132,7 @@ buffer_t &buffer_t::append(const char *fmt, ...)
 	_buffer = buf;
 	_curSize = next_sz;
 
-	va_start(va, fmt);
-	this->append(fmt, va);
-	va_end(va);
-
-	return *this;
+	return this->append(fmt, va);
 TRUNC:
 	_flags |= BUFFER_T_TRUNC_FLAG;
 	_current += left_sz - 1;
