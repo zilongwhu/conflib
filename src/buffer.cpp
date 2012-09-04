@@ -37,40 +37,59 @@ static int nextPower2(int val)
 	return ret;
 }
 
+enum
+{
+	BUFFER_T_AUTO_FLAG = 1,
+	BUFFER_T_TRUNC_FLAG = 2,
+};
+
 buffer_t::buffer_t(size_t initSize)
 {
-	_truncFlag = 0;
+	_flags = BUFFER_T_AUTO_FLAG;
 	_curSize = nextPower2(initSize);
 	_buffer = (char *)malloc(_curSize);
 	_current = _buffer;
 }
 
+buffer_t::buffer_t(char *buffer, size_t initSize)
+{
+	_flags = 0;
+	_curSize = initSize;
+	_buffer = buffer;
+	_current = _buffer;
+}
+
 buffer_t::buffer_t(const buffer_t &o)
 {
-	_truncFlag = o._truncFlag;
+	_flags = o._flags;
 	_curSize = o._curSize;
-	if (o._buffer)
+	if ((_flags & BUFFER_T_AUTO_FLAG) == 0)
 	{
-		_buffer = (char *)malloc(_curSize);
-		if (_buffer && o._current > o._buffer)
-		{
-			memcpy(_buffer, o._buffer, o._current - o._buffer);
-			_current = (o._current - o._buffer) + _buffer;
-		}
-		else
-		{
-			_current = _buffer;
-		}
+		_buffer = o._buffer;
+		_current = o._current;
+		return ;
 	}
-	else
+	/* auto buffer */
+	if (o._buffer == NULL)
 	{
 		_current = _buffer = NULL;
+		return ;
 	}
+	_buffer = (char *)malloc(_curSize);
+	if (_buffer && o._current > o._buffer)
+	{
+		memcpy(_buffer, o._buffer, o._current - o._buffer);
+		_current = _buffer + (o._current - o._buffer);
+		return ;
+	}
+	_current = _buffer;
 }
 
 buffer_t::~buffer_t()
 {
-	_truncFlag = 0;
+	if ((_flags & BUFFER_T_AUTO_FLAG) && _buffer)
+		free(_buffer);
+	_flags = 0;
 	_curSize = 0;
 	_current = _buffer = NULL;
 }
@@ -86,7 +105,7 @@ buffer_t &buffer_t::append(const char *fmt, ...)
 {
 	if (!_buffer)
 	{
-		_truncFlag |= 1;
+		_flags |= BUFFER_T_TRUNC_FLAG;
 		return *this;
 	}
 	const size_t left_sz = _curSize - (_current - _buffer);
@@ -94,29 +113,22 @@ buffer_t &buffer_t::append(const char *fmt, ...)
 	va_start(va, fmt);
 	int ret = vsnprintf(_current, left_sz, fmt, va);
 	va_end(va);
-	if (ret < 0)
-	{
-		return *this;
-	}
+	if (ret < 0) return *this;
 	if (ret < left_sz)
 	{
 		_current += ret;
 		return *this;
 	}
-	int next_sz = nextPower2(_curSize + ret + 1 - left_sz);
+	char *buf;
+	int next_sz;
+	if ((_flags & BUFFER_T_AUTO_FLAG) == 0)  /* static buffer */
+		goto TRUNC;
+	next_sz = nextPower2(_curSize + ret + 1 - left_sz);
 	if (next_sz <= _curSize)
-	{
-		_truncFlag |= 1;
-		_current += left_sz - 1;
-		return *this;
-	}
-	char *buf = (char *)malloc(next_sz);
+		goto TRUNC;
+	buf = (char *)malloc(next_sz);
 	if (!buf)
-	{
-		_truncFlag |= 1;
-		_current += left_sz - 1;
-		return *this;
-	}
+		goto TRUNC;
 	if (_current > _buffer)
 		memcpy(buf, _buffer, _current - _buffer);
 	_current = buf + (_current - _buffer);
@@ -128,5 +140,9 @@ buffer_t &buffer_t::append(const char *fmt, ...)
 	this->append(fmt, va);
 	va_end(va);
 
+	return *this;
+TRUNC:
+	_flags |= BUFFER_T_TRUNC_FLAG;
+	_current += left_sz - 1;
 	return *this;
 }
