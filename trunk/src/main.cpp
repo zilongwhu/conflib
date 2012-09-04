@@ -29,5 +29,11 @@ int main(int argc, char *argv[])
 	for (int i=0; i<16;++i)
 		buf.print_hex(i);
 	printf("%s\n", buf.c_str());
+
+	char tmp[256];
+	buffer_t buf2(tmp, sizeof tmp);
+	buf2 += 100;
+	buf2 += " abcdefg";
+	printf("%s\n", buf2.c_str());
 	return 0;
 }

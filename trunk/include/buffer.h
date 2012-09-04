@@ -19,12 +19,14 @@
 #ifndef __APPENDABLE_BUFFER_H__
 #define __APPENDABLE_BUFFER_H__
 
+#include <stdint.h>
 #include <linux/types.h>
 
 class buffer_t
 {
 	public:
-		buffer_t(size_t initSize = 1024);
+		buffer_t(size_t initSize = 1024); /* auto buffer */
+		buffer_t(char *buffer, size_t initSize); /* static buffer */
 		buffer_t(const buffer_t &o);
 
 		~buffer_t();
@@ -142,15 +144,15 @@ class buffer_t
 			_curSize = o._curSize;
 			o._curSize = sz;
 
-			int flag = _truncFlag;
-			_truncFlag = o._truncFlag;
-			o._truncFlag = flag;
+			uint32_t flag = _flags;
+			_flags = o._flags;
+			o._flags = flag;
 		}
 	private:
 		char *_buffer;
 		char *_current;
 		size_t _curSize;
-		int _truncFlag;
+		uint32_t _flags;
 };
 
 #endif
