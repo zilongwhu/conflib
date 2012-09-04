@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include "buffer.h"
+#include "any.h"
 
 int main(int argc, char *argv[])
 {
@@ -40,5 +41,14 @@ int main(int argc, char *argv[])
 	buf3 += 333;
 	buf3 += " 666";
 	printf("%s\n", buf3.c_str());
+
+	buffer_t buf4 = buf;
+	buffer_t buf5 = buf2;
+	buffer_t buf6 = buf3;
+	printf("%s\n", buf4.c_str());
+	printf("%s\n", buf5.c_str());
+	printf("%s\n", buf6.c_str());
+
+	Any any;
 	return 0;
 }

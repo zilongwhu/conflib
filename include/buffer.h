@@ -130,6 +130,12 @@ class buffer_t
 			return *this;
 		}
 
+		buffer_t &clear()
+		{
+			_current = _buffer;
+			return *this;
+		}
+
 		const char *c_str() const
 		{
 			if (!_current)
