@@ -20,6 +20,7 @@
 #define __APPENDABLE_BUFFER_H__
 
 #include <stdint.h>
+#include <stdarg.h>
 #include <linux/types.h>
 
 class buffer_t
@@ -120,7 +121,14 @@ class buffer_t
 			return *this;
 		}
 
-		buffer_t &append(const char *fmt, ...);
+		buffer_t &append(const char *fmt, ...)
+		{
+			va_list va;
+			va_start(va, fmt);
+			this->append(fmt, va);
+			va_end(va);
+			return *this;
+		}
 
 		const char *c_str() const
 		{
@@ -148,6 +156,8 @@ class buffer_t
 			_flags = o._flags;
 			o._flags = flag;
 		}
+	private:
+		buffer_t &append(const char *fmt, va_list va);
 	private:
 		char *_buffer;
 		char *_current;

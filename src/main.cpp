@@ -35,5 +35,10 @@ int main(int argc, char *argv[])
 	buf2 += 100;
 	buf2 += " abcdefg";
 	printf("%s\n", buf2.c_str());
+
+	buffer_t buf3(4);
+	buf3 += 333;
+	buf3 += " 666";
+	printf("%s\n", buf3.c_str());
 	return 0;
 }
