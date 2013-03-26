@@ -19,17 +19,19 @@
 #ifndef __ANY_TYPE_H__
 #define __ANY_TYPE_H__
 
-#include <string>
 #include <map>
+#include <string>
 
 class Any
 {
 	public:
 		typedef std::map<std::string, Any> dict_type;
 	public:
-		Any():_type(UNSET) { }
+		Any();
 		Any(const Any &o);
-		~Any() { }
+		~Any();
+
+        void swap(Any &o);
 
 		Any &operator =(const Any &o);
 
@@ -102,7 +104,7 @@ class Any
 
 			std::string *_string_value;
 			dict_type *_dict_value;
-		};
+		} _value;
 };
 
 #endif

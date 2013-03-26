@@ -16,102 +16,16 @@
  * =====================================================================================
  */
 
+#include <stdio.h>
+#include <string.h>
 #include "any.h"
 
-Any::Any(AnyType type)
-	: _type(type)
-{
-	switch(_type)
-	{
-	case UNSET:
-		break;
-	case CHAR_TYPE:
-		_value._char_value = '\0';
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = '\0';
-		break;
-	case SHORT_TYPE:
-		_value._short_value = 0;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = 0;
-		break;
-	case INT_TYPE:
-		_value._int_value = 0;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = 0;
-		break;
-	case LONG_TYPE:
-		_value._long_value = 0;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = 0;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = 0;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = 0;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = 0.0;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = 0.0;
-		break;
-	case STRING_TYPE:
-		_value._string_value = new(std::nothrow) std::string;
-		break;
-	case DICT_TYPE:
-		_value._dict_value = new(std::nothrow) dict_type;
-		break;
-	}
-}
+Any::Any() { _type = UNSET; }
 
 Any::~Any()
 {
 	switch(_type)
 	{
-	case UNSET:
-		break;
-	case CHAR_TYPE:
-		_value._char_value = '\0';
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = '\0';
-		break;
-	case SHORT_TYPE:
-		_value._short_value = 0;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = 0;
-		break;
-	case INT_TYPE:
-		_value._int_value = 0;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = 0;
-		break;
-	case LONG_TYPE:
-		_value._long_value = 0;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = 0;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = 0;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = 0;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = 0.0;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = 0.0;
-		break;
 	case STRING_TYPE:
 		if (_value._string_value)
 			delete _value._string_value;
@@ -129,8 +43,6 @@ Any::Any(const Any &o)
 {
 	switch(_type)
 	{
-	case UNSET:
-		break;
 	case CHAR_TYPE:
 		_value._char_value = o._value._char_value;
 		break;
@@ -185,7 +97,7 @@ Any::Any(const Any &o)
 void Any::swap(Any &o)
 {
 	{
-		AnyType tmp = _type;
+		int tmp = _type;
 		_type = o._type;
 		o._type = tmp;
 	}
@@ -197,722 +109,80 @@ void Any::swap(Any &o)
 	}
 }
 
-Any &Any::operator=(char val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = CHAR_TYPE;
-		_value._char_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char tmp[2];
-			tmp[0] = val;
-			tmp[1] = '\0';
-			*_value._string_value = tmp;
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set char value to dict_type");
-		break;
-	}
-	return *this;
+#define ANY_ASSGIN_OP(type, TYPE, name, fmt) \
+Any &Any::operator=(type val)\
+{\
+	switch(_type)\
+	{\
+	case UNSET:\
+		_type = TYPE;\
+		_value.name = val;\
+		break;\
+	case CHAR_TYPE:\
+		_value._char_value = static_cast<char>(val);\
+		break;\
+	case UCHAR_TYPE:\
+		_value._uchar_value = static_cast<unsigned char>(val);\
+		break;\
+	case SHORT_TYPE:\
+		_value._short_value = static_cast<short>(val);\
+		break;\
+	case USHORT_TYPE:\
+		_value._ushort_value = static_cast<unsigned short>(val);\
+		break;\
+	case INT_TYPE:\
+		_value._int_value = static_cast<int>(val);\
+		break;\
+	case UINT_TYPE:\
+		_value._uint_value = static_cast<unsigned int>(val);\
+		break;\
+	case LONG_TYPE:\
+		_value._long_value = static_cast<long>(val);\
+		break;\
+	case ULONG_TYPE:\
+		_value._ulong_value = static_cast<unsigned long>(val);\
+		break;\
+	case LONGLONG_TYPE:\
+		_value._longlong_value = static_cast<long long>(val);\
+		break;\
+	case ULONGLONG_TYPE:\
+		_value._ulonglong_value = static_cast<unsigned long long>(val);\
+		break;\
+	case DOUBLE_TYPE:\
+		_value._double_value = static_cast<double>(val);\
+		break;\
+	case LONGDOUBLE_TYPE:\
+		_value._longdouble_value = static_cast<long double>(val);\
+		break;\
+	case STRING_TYPE:\
+		{\
+			char buf[128];\
+			if (::snprintf(buf, sizeof buf, fmt, val) > 0)\
+            {\
+                if (_value._string_value)\
+                    *_value._string_value = buf;\
+                else\
+                    _value._string_value = new (std::nothrow) std::string(buf);\
+            }\
+		}\
+		break;\
+	}\
+	return *this;\
 }
 
-Any &Any::operator=(unsigned char val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = UCHAR_TYPE;
-		_value._uchar_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%hhu", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set unsigned char value to dict_type");
-		break;
-	}
-	return *this;
-}
+ANY_ASSGIN_OP(char, CHAR_TYPE, _char_value, "%c");
+ANY_ASSGIN_OP(short, SHORT_TYPE, _short_value, "%hd");
+ANY_ASSGIN_OP(int, INT_TYPE, _int_value, "%d");
+ANY_ASSGIN_OP(long, LONG_TYPE, _long_value, "%ld");
+ANY_ASSGIN_OP(long long, LONGLONG_TYPE, _longlong_value, "%lld");
 
-Any &Any::operator=(short val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = SHORT_TYPE;
-		_value._short_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%hd", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set short value to dict_type");
-		break;
-	}
-	return *this;
-}
+ANY_ASSGIN_OP(unsigned char, UCHAR_TYPE, _uchar_value, "%hhu");
+ANY_ASSGIN_OP(unsigned short, USHORT_TYPE, _ushort_value, "%hu");
+ANY_ASSGIN_OP(unsigned int, UINT_TYPE, _uint_value, "%u");
+ANY_ASSGIN_OP(unsigned long, ULONG_TYPE, _ulong_value, "%lu");
+ANY_ASSGIN_OP(unsigned long long, ULONGLONG_TYPE, _ulonglong_value, "%llu");
 
-Any &Any::operator=(unsigned short val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = USHORT_TYPE;
-		_value._ushort_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%hu", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set unsigned short value to dict_type");
-		break;
-	}
-	return *this;
-}
+ANY_ASSGIN_OP(double, DOUBLE_TYPE, _double_value, "%lf");
+ANY_ASSGIN_OP(long double, LONGDOUBLE_TYPE, _longdouble_value, "%Lf");
 
-Any &Any::operator=(int val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = INT_TYPE;
-		_value._int_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%d", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set int value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(unsigned int val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = UINT_TYPE;
-		_value._uint_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%u", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set unsigned int value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(long val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = LONG_TYPE;
-		_value._long_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%ld", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set long value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(unsigned long val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = ULONG_TYPE;
-		_value._ulong_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%lu", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set unsigned long value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(long long val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = LONGLONG_TYPE;
-		_value._longlong_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%lld", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set long long value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(unsigned long long val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = ULONGLONG_TYPE;
-		_value._ulonglong_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%llu", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set unsigned long long value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(double val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = DOUBLE_TYPE;
-		_value._double_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%f", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set double value to dict_type");
-		break;
-	}
-	return *this;
-}
-
-Any &Any::operator=(long double val)
-{
-	switch(_type)
-	{
-	case UNSET:
-		_type = LONGDOUBLE_TYPE;
-		_value._longdouble_value = val;
-		break;
-	case CHAR_TYPE:
-		_value._char_value = val;
-		break;
-	case UCHAR_TYPE:
-		_value._uchar_value = val;
-		break;
-	case SHORT_TYPE:
-		_value._short_value = val;
-		break;
-	case USHORT_TYPE:
-		_value._ushort_value = val;
-		break;
-	case INT_TYPE:
-		_value._int_value = val;
-		break;
-	case UINT_TYPE:
-		_value._uint_value = val;
-		break;
-	case LONG_TYPE:
-		_value._long_value = val;
-		break;
-	case ULONG_TYPE:
-		_value._ulong_value = val;
-		break;
-	case LONGLONG_TYPE:
-		_value._longlong_value = val;
-		break;
-	case ULONGLONG_TYPE:
-		_value._ulonglong_value = val;
-		break;
-	case DOUBLE_TYPE:
-		_value._double_value = val;
-		break;
-	case LONGDOUBLE_TYPE:
-		_value._longdouble_value = val;
-		break;
-	case STRING_TYPE:
-		if (_value._string_value)
-		{
-			char buf[128];
-			if (_snprintf(buf, sizeof buf, "%lf", val) > 0)
-				*_value._string_value = buf;
-			else throw std::exception("snprintf error");
-		}
-		break;
-	case DICT_TYPE:
-		throw std::exception("set long double value to dict_type");
-		break;
-	}
-	return *this;
-}
+#undef ANY_ASSIGN_OP
