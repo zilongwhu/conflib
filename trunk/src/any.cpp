@@ -16,9 +16,9 @@
  * =====================================================================================
  */
 
-#include <stdio.h>
 #include <string.h>
 #include "any.h"
+#include "buffer.h"
 
 Any::Any() { _type = UNSET; }
 
@@ -156,14 +156,12 @@ Any &Any::operator=(type val)\
 		break;\
 	case STRING_TYPE:\
 		{\
-			char buf[128];\
-			if (::snprintf(buf, sizeof buf, fmt, val) > 0)\
-            {\
-                if (_value._string_value)\
-                    *_value._string_value = buf;\
-                else\
-                    _value._string_value = new (std::nothrow) std::string(buf);\
-            }\
+			buffer_t buf(128);\
+            buf += val;\
+            if (_value._string_value)\
+                *_value._string_value = buf.c_str();\
+            else\
+                _value._string_value = new (std::nothrow) std::string(buf.c_str());\
 		}\
 		break;\
 	}\
