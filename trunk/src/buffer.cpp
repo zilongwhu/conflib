@@ -110,7 +110,7 @@ buffer_t &buffer_t::append(const char *fmt, va_list va)
 	const size_t left_sz = _curSize - (_current - _buffer);
 	int ret = vsnprintf(_current, left_sz, fmt, va);
 	if (ret < 0) return *this;
-	if (ret < left_sz)
+	if (ret < (int)left_sz)
 	{
 		_current += ret;
 		return *this;
@@ -120,7 +120,7 @@ buffer_t &buffer_t::append(const char *fmt, va_list va)
 	if ((_flags & BUFFER_T_AUTO_FLAG) == 0)  /* static buffer */
 		goto TRUNC;
 	next_sz = nextPower2(_curSize + ret + 1 - left_sz);
-	if (next_sz <= _curSize)
+	if (next_sz <= (int)_curSize)
 		goto TRUNC;
 	buf = (char *)malloc(next_sz);
 	if (!buf)

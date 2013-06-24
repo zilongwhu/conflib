@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include "buffer.h"
+#include "configure.h"
 
 int main(int argc, char *argv[])
 {
@@ -48,5 +49,10 @@ int main(int argc, char *argv[])
 	printf("%s\n", buf5.c_str());
 	printf("%s\n", buf6.c_str());
 
+    Config conf("./conf", "test.conf");
+    conf.parse();
+    printf("abc=[%s]\n", conf["abc"].c_str());
+    printf("err=[%s]\n", conf["err"].c_str());
+    printf("key err=[%s]\n", conf["key err"].c_str());
 	return 0;
 }

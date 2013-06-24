@@ -19,8 +19,33 @@
 #ifndef __CONFIGURE_HEADER_H__
 #define __CONFIGURE_HEADER_H__
 
-typedef struct configure_s
+#include <map>
+#include <string>
+
+class Config
 {
-} configure_t;
+    public:
+        Config(const char *path, const char *file)
+            :_path(path), _file(file)
+        { }
+        ~Config() { }
+
+        int parse();
+
+        const std::string &operator[](const std::string &key) const
+        {
+            std::map<std::string, std::string>::const_iterator it = _confs.find(key);
+            if (it != _confs.end())
+            {
+                return it->second;
+            }
+            return "";
+        }
+    private:
+        const std::string _path;
+        const std::string _file;
+
+        std::map<std::string, std::string> _confs;
+};
 
 #endif
