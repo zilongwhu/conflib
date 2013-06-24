@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 #include "buffer.h"
-#include "any.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +48,5 @@ int main(int argc, char *argv[])
 	printf("%s\n", buf5.c_str());
 	printf("%s\n", buf6.c_str());
 
-	Any any;
 	return 0;
 }
