@@ -69,6 +69,28 @@ class Config
             }
             return false;
         }
+
+        bool get(const std::string &key, int &value) const
+        {
+            std::string strvalue;
+            if (this->get(key, strvalue))
+            {
+                value = atoi(strvalue.c_str());
+                return true;
+            }
+            return false;
+        }
+
+        bool get(const std::string &key, double &value) const
+        {
+            std::string strvalue;
+            if (this->get(key, strvalue))
+            {
+                value = atof(strvalue.c_str());
+                return true;
+            }
+            return false;
+        }
     private:
         const std::string _path;
         const std::string _file;
