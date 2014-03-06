@@ -21,6 +21,23 @@
 
 #include <map>
 #include <string>
+#include <exception>
+
+class KeyNotExistException: public std::exception
+{
+    public:
+        KeyNotExistException(const std::string &key) throw()
+            : m_message(key + " not exist")
+        { }
+        ~KeyNotExistException() throw() { }
+
+        const char *what() const throw()
+        {
+            return m_message.c_str();
+        }
+    private:
+        const std::string m_message;
+};
 
 class Config
 {
@@ -32,14 +49,25 @@ class Config
 
         int parse();
 
-        const std::string &operator[](const std::string &key) const
+        std::string operator[](const std::string &key) const
+        {
+            std::string value;
+            if (this->get(key, value))
+            {
+                return value;
+            }
+            throw KeyNotExistException(key);
+        }
+
+        bool get(const std::string &key, std::string &value) const
         {
             std::map<std::string, std::string>::const_iterator it = _confs.find(key);
             if (it != _confs.end())
             {
-                return it->second;
+                value = it->second;
+                return true;
             }
-            return "";
+            return false;
         }
     private:
         const std::string _path;
