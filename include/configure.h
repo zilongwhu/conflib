@@ -22,6 +22,7 @@
 #include <map>
 #include <string>
 #include <exception>
+#include <stdlib.h>
 
 class KeyNotExistException: public std::exception
 {
